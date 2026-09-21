@@ -1,6 +1,6 @@
 @Entity
 @Table(name = "Venues")
-public class Venues {
+public class Venue {
 
     @Id
     @GeneratedValue

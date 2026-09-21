@@ -28,5 +28,5 @@ public class UserProfile {
         unique = true
     )
     private User user;
-
+    
 }

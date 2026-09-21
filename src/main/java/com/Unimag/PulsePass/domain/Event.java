@@ -29,6 +29,9 @@ public class Event {
     @Column(name = "minimum_age", nullable = false)
     private Integer minimumAge;
 
+    @Column(name = "streaming_url", length = 500)
+    private String streamingUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "venue_id", nullable = false)
     private Venues venue;
@@ -44,5 +47,4 @@ public class Event {
     )
     private Set<Artist> artists = new HashSet<>();
 
-    private List<Artist> artists = new ArrayList<>();
 }
