@@ -1,14 +1,15 @@
 package com.Unimag.PulsePass.repository;
 
-import com.Unimag.PulsePass.domain.Event;
-import com.Unimag.PulsePass.domain.enums.EventStatus;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import com.Unimag.PulsePass.domain.Event;
+import com.Unimag.PulsePass.domain.enums.EventStatus;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
@@ -24,6 +25,19 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         WHERE LOWER(a.stageName) = LOWER(:stageName)
     """)
     List<Event> findEventsByArtistStageName(@Param("stageName") String stageName);
+
+    @Query("""
+        SELECT DISTINCT e
+        FROM Event e
+        JOIN e.venue v
+        JOIN e.artists a
+        WHERE v.city = :city
+      AND LOWER(a.stageName) = LOWER(:stageName)
+        """)
+        List<Event> findByCityAndArtist(
+            @Param("city") String city,
+            @Param("stageName") String stageName
+    );
 
     @Query("""
         SELECT DISTINCT e FROM Event e
