@@ -1,3 +1,23 @@
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.JoinTable;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+
 @Entity
 @Table(name = "events")
 public class Event {
@@ -29,7 +49,7 @@ public class Event {
     @Column(name = "minimum_age", nullable = false)
     private Integer minimumAge;
 
-    @Column(name = "streaming_url", length = 500)
+    @Column(name = "streaming_url", length = 500) 
     private String streamingUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,5 +66,4 @@ public class Event {
         inverseJoinColumns = @JoinColumn(name = "artist_id")
     )
     private Set<Artist> artists = new HashSet<>();
-
 }
