@@ -1,3 +1,5 @@
+package com.Unimag.PulsePass.domain;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,5 +32,53 @@ public class Artist {
     private Boolean active;
 
     @ManyToMany(mappedBy = "artists")
-    private Set<Event> events = new HashSet<>();  
+    private Set<Event> events = new HashSet<>();
+
+    public Long getId() {
+    return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getStageName() {
+        return stageName;
+    }
+
+    public void setStageName(String stageName) {
+        this.stageName = stageName;
+        }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public Set<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(Set<Event> events) {
+        this.events = events;
+    }
 }
