@@ -1,6 +1,18 @@
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
+import jakarta.validation.constraints.Positive;
+
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "Venues")
-public class Venues {
+public class Venue {
 
     @Id
     @GeneratedValue
