@@ -1,19 +1,5 @@
 package com.Unimag.PulsePass;
 
-import com.Unimag.PulsePass.domain.*;
-import com.Unimag.PulsePass.domain.enums.*;
-import com.Unimag.PulsePass.repository.*;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.connection.ServiceConnection;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,6 +8,32 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import com.Unimag.PulsePass.domain.Event;
+import com.Unimag.PulsePass.domain.Ticket;
+import com.Unimag.PulsePass.domain.User;
+import com.Unimag.PulsePass.domain.UserProfile;
+import com.Unimag.PulsePass.domain.Venue;
+import com.Unimag.PulsePass.domain.enums.EventCategory;
+import com.Unimag.PulsePass.domain.enums.EventStatus;
+import com.Unimag.PulsePass.domain.enums.TicketStatus;
+import com.Unimag.PulsePass.domain.enums.TicketType;
+import com.Unimag.PulsePass.repository.ArtistRepository;
+import com.Unimag.PulsePass.repository.EventRepository;
+import com.Unimag.PulsePass.repository.TicketRepository;
+import com.Unimag.PulsePass.repository.UserProfileRepository;
+import com.Unimag.PulsePass.repository.UserRepository;
+import com.Unimag.PulsePass.repository.VenueRepository;
 
 @Testcontainers
 @SpringBootTest
@@ -161,7 +173,7 @@ class PersistenceIntegrationTest {
         ticketRepository.save(ticket);
 
         assertThat(ticketRepository.count()).isOne();
-        List<Ticket> paidTickets = ticketRepository.findByEventEventCodeAndStatus(激"EVT-CORE-01", TicketStatus.PAID);
+        List<Ticket> paidTickets = ticketRepository.findByEventEventCodeAndStatus("EVT-CORE-01",TicketStatus.PAID);
         assertThat(paidTickets).hasSize(1);
     }
 }
