@@ -10,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Positive;
 
 @Entity
 @Table(name = "venues")
@@ -32,7 +31,7 @@ public class Venue {
     @Column(name = "address", length = 255)
     private String address;
 
-    @Positive(message = "La capacidad debe ser mayor que 0")
+    
     @Column(name = "capacity", nullable = false)
     private Integer capacity;
 

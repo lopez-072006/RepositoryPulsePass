@@ -11,5 +11,4 @@ public interface ArtistRepository extends JpaRepository<Artist, Long> {
     Optional<Artist> findByStageNameIgnoreCase(String stageName);
 
     List<Artist> findByActiveTrueOrderByStageNameAsc();
-
 }
