@@ -15,6 +15,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     List<Ticket> findByUserEmailIgnoreCaseAndStatus(String email, TicketStatus status);
 
+    List<Ticket> findByUserEmailIgnoreCaseOrderByPurchaseDateDesc(String email);
+
     List<Ticket> findByEventEventCodeAndStatus(String eventCode, TicketStatus status);
 
     @Query("""
@@ -26,4 +28,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
             @Param("eventCode") String eventCode,
             @Param("status") TicketStatus status
     );
+
+    long countByEventEventCodeAndStatus(String eventCode, TicketStatus status);
 }

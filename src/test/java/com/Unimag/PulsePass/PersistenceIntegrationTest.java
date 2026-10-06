@@ -6,7 +6,7 @@ import com.Unimag.PulsePass.repository.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.connection.ServiceConnection;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -161,7 +161,7 @@ class PersistenceIntegrationTest {
         ticketRepository.save(ticket);
 
         assertThat(ticketRepository.count()).isOne();
-        List<Ticket> paidTickets = ticketRepository.findByEventEventCodeAndStatus(激"EVT-CORE-01", TicketStatus.PAID);
+        List<Ticket> paidTickets = ticketRepository.findByEventEventCodeAndStatus("EVT-CORE-01", TicketStatus.PAID);
         assertThat(paidTickets).hasSize(1);
     }
 }
