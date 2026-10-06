@@ -1,13 +1,14 @@
 package com.Unimag.PulsePass.repository;
 
-import java.util.Optional;
-
+import com.Unimag.PulsePass.domain.Artist;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.Unimag.PulsePass.domain.Artist;
+import java.util.List;
+import java.util.Optional;
 
 public interface ArtistRepository extends JpaRepository<Artist, Long> {
 
-    Optional<Artist> findByStageName(String stageName);
+    Optional<Artist> findByStageNameIgnoreCase(String stageName);
 
+    List<Artist> findByActiveTrueOrderByStageNameAsc();
 }
