@@ -1,5 +1,23 @@
 package com.Unimag.PulsePass.service.impl;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.Unimag.PulsePass.domain.Event;
 import com.Unimag.PulsePass.domain.Ticket;
 import com.Unimag.PulsePass.domain.User;
@@ -17,22 +35,6 @@ import com.Unimag.PulsePass.mapper.TicketMapper;
 import com.Unimag.PulsePass.repository.EventRepository;
 import com.Unimag.PulsePass.repository.TicketRepository;
 import com.Unimag.PulsePass.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Optional;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TicketServiceImplTest {
@@ -120,7 +122,7 @@ class TicketServiceImplTest {
     void purchase_whenUserIsBelowMinimumAge_throwsAndDoesNotSave() {
         LocalDate eventDay = publishedEvent.getEventDate().toLocalDate();
         activeUser.getUserProfile().setBirthDate(eventDay.minusYears(17));
-        givenPurchasable(activeUser, publishedEvent, 0);
+        givenUserAndEvent(activeUser, publishedEvent);
         assertThatThrownBy(() -> service.purchase(request())).isInstanceOf(BusinessRuleException.class);
         verify(ticketRepository, never()).save(any(Ticket.class));
     }
