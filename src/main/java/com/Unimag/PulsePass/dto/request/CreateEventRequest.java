@@ -5,7 +5,6 @@ import com.Unimag.PulsePass.domain.enums.EventCategory;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 
@@ -17,8 +16,6 @@ public record CreateEventRequest(
         @NotBlank(message = "Event name is required")
         String name,
 
-        @Size(max = 1000,
-              message = "Description cannot exceed 1000 characters")
         String description,
 
         @NotNull(message = "Event category is required")
