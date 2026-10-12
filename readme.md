@@ -1226,6 +1226,102 @@ Esto confirma que las funcionalidades de persistencia cubiertas por las pruebas 
 
 ---
 
+## API REST — Controladores
+
+La API de PulsePass expone operaciones REST para consultar recintos y artistas, registrar y consultar usuarios, administrar eventos y gestionar tickets. Los controladores reciben y devuelven DTOs, delegan la lógica de negocio en los servicios y utilizan `ResponseEntity` para definir los códigos HTTP.
+
+### Endpoints
+
+#### Recintos (Venues)
+
+| Método | Endpoint |
+|---|---|
+| GET | `/api/venues/{code}` |
+| GET | `/api/venues/active` |
+
+#### Artistas (Artists)
+
+| Método | Endpoint |
+|---|---|
+| GET | `/api/artists/{id}` |
+| GET | `/api/artists/by-stage-name?stageName={stageName}` |
+| GET | `/api/artists/active` |
+
+#### Usuarios (Users)
+
+| Método | Endpoint |
+|---|---|
+| POST | `/api/users` |
+| GET | `/api/users/by-email?email={email}` |
+| GET | `/api/users/by-username?username={username}` |
+
+#### Eventos (Events)
+
+| Método | Endpoint |
+|---|---|
+| POST | `/api/events` |
+| GET | `/api/events/{eventCode}` |
+| GET | `/api/events/published` |
+| PATCH | `/api/events/{eventCode}/publish` |
+| POST | `/api/events/{eventCode}/artists/{artistId}` |
+| GET | `/api/events/by-artist?stageName={stageName}` |
+
+#### Tickets
+
+| Método | Endpoint |
+|---|---|
+| POST | `/api/tickets` |
+| GET | `/api/tickets/{ticketCode}` |
+| GET | `/api/tickets/by-user?email={email}` |
+| GET | `/api/events/{eventCode}/tickets/paid` |
+| PATCH | `/api/tickets/{ticketCode}/cancel` |
+| PATCH | `/api/tickets/{ticketCode}/use` |
+
+### Ejemplo de compra de un ticket
+
+**Solicitud:** `POST /api/tickets`
+
+Encabezado: `Content-Type: application/json`
+
+```json
+{
+  "userEmail": "usuario@example.com",
+  "eventCode": "EVT-001",
+  "type": "<valor válido de TicketType>"
+}
+```
+
+Sustituye el marcador por un valor definido en el enum `TicketType` y usa un usuario y un evento que existan y cumplan las reglas del servicio.
+
+Una compra exitosa devuelve `201 Created`.
+
+### Manejo de errores
+
+Las excepciones se procesan mediante `GlobalExceptionHandler`. Las respuestas utilizan la estructura `ErrorResponse`.
+
+- `400 Bad Request`: solicitud inválida, datos que incumplen las validaciones o JSON mal formado.
+- `404 Not Found`: recurso solicitado inexistente.
+- `409 Conflict`: duplicados o reglas de negocio incumplidas.
+- `500 Internal Server Error`: error inesperado del servidor.
+
+### Ejecución de las pruebas
+
+Se requiere Java 21 y Maven Wrapper. Docker Desktop debe estar iniciado para las pruebas de integración que utilizan Testcontainers y PostgreSQL.
+
+Desde la raíz del proyecto, ejecuta:
+
+```bash
+./mvnw clean test
+```
+
+En Windows CMD o PowerShell:
+
+```powershell
+.\mvnw.cmd clean test
+```
+
+La suite incluye pruebas unitarias, pruebas de integración de persistencia y pruebas MVC de los cinco controladores mediante MockMvc.
+
 # 34. Autores
 
 Proyecto desarrollado por Cristian Garaviz y Sofia Lopez como parte del proceso académico de Ingeniería de Sistemas.
