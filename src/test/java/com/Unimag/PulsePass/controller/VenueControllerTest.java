@@ -3,7 +3,7 @@ package com.Unimag.PulsePass.controller;
 
 import com.Unimag.PulsePass.dto.response.VenueResponse;
 import com.Unimag.PulsePass.service.VenueService;
-
+import com.Unimag.PulsePass.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -28,6 +28,29 @@ class VenueControllerTest {
 
     @MockitoBean
     private VenueService venueService;
+
+    @Test
+void findByCode_nonExistingVenue_returns404() throws Exception {
+
+    when(venueService.findByCode("VEN-999"))
+            .thenThrow(
+                    new ResourceNotFoundException(
+                            "Venue not found: VEN-999"
+                    )
+            );
+
+    mockMvc.perform(get("/api/venues/VEN-999"))
+            .andExpect(status().isNotFound())
+            .andExpect(content().contentTypeCompatibleWith(
+                    MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.status").value(404))
+            .andExpect(jsonPath("$.error").value("Not Found"))
+            .andExpect(jsonPath("$.message")
+                    .value("Venue not found: VEN-999"))
+            .andExpect(jsonPath("$.details").isMap());
+
+    verify(venueService).findByCode("VEN-999");
+}
 
     @Test
     void findByCode_existingVenue_returns200() throws Exception {
