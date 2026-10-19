@@ -9,7 +9,31 @@ Sistema de persistencia para una plataforma de gestión de eventos, artistas, lu
 
 El proyecto implementa la capa de persistencia de **PulsePass** utilizando Spring Boot, JPA/Hibernate, PostgreSQL y Flyway. También incluye consultas mediante Spring Data JPA, consultas JPQL y pruebas de integración utilizando PostgreSQL mediante Testcontainers.
 
-> **Estado actual:** capa de persistencia implementada y validada mediante pruebas de integración.
+> **Estado actual:** persistencia, controladores REST y capa de seguridad JWT implementadas.
+
+## Seguridad
+
+La API usa Spring Security sin sesiones y JWT HS256 con JJWT. Las contraseñas se almacenan con BCrypt
+en `user_credentials`; los roles viven en `user_roles`. El registro crea usuario, hash y `ROLE_USER`
+en una transacción. Las cuentas preexistentes no reciben credenciales predeterminadas y requieren
+activación controlada. Los roles se vuelven a cargar desde la base de datos con cada Bearer token.
+
+Rutas nuevas: `POST /api/auth/login` (usuario o correo y contraseña) y `GET /api/auth/me` (requiere Bearer).
+`POST /api/users` incorpora el campo `password` (12 a 72 bytes UTF-8) y mantiene `UserResponse` sin secretos.
+Las operaciones de tickets y búsquedas de usuarios validan propiedad en la capa de servicio; el acceso
+STAFF a tickets es global en este MVP porque el dominio no asigna personal a eventos.
+
+La aplicación requiere `PULSEPASS_JWT_SECRET_BASE64`, una clave Base64 con al menos 32 bytes aleatorios.
+No se guarda el secreto en el repositorio. En PowerShell se puede generar uno para la sesión actual:
+
+```powershell
+$jwtBytes = New-Object byte[] 32
+[System.Security.Cryptography.RandomNumberGenerator]::Fill($jwtBytes)
+$env:PULSEPASS_JWT_SECRET_BASE64 = [Convert]::ToBase64String($jwtBytes)
+```
+
+Opcionalmente se configuran `PULSEPASS_JWT_ISSUER` y `PULSEPASS_JWT_ACCESS_TOKEN_TTL` (por defecto `PT15M`).
+Flyway `V4__security_credentials_roles.sql` agrega tablas sin reescribir migraciones anteriores.
 
 ---
 
@@ -1150,7 +1174,7 @@ flyway_schema_history
 
 # 30. Alcance actual
 
-El alcance actual del proyecto está centrado en la persistencia.
+El proyecto contiene persistencia, controladores REST y seguridad de autenticación/autorización.
 
 Incluye:
 
@@ -1164,18 +1188,14 @@ Incluye:
 - JPQL.
 - Testcontainers.
 - Pruebas de integración.
+- Seguridad stateless con roles, JWT y control de propiedad de tickets/usuarios.
 
 ---
 
 # 31. Fuera de alcance
 
-De acuerdo con el alcance definido para esta etapa, no se implementan:
+Fuera del alcance de esta fase:
 
-- API REST.
-- Controladores.
-- Servicios de negocio.
-- Autenticación.
-- Autorización.
 - Procesamiento de pagos.
 - Frontend.
 - Aplicación móvil.
@@ -1231,6 +1251,16 @@ Esto confirma que las funcionalidades de persistencia cubiertas por las pruebas 
 La API de PulsePass expone operaciones REST para consultar recintos y artistas, registrar y consultar usuarios, administrar eventos y gestionar tickets. Los controladores reciben y devuelven DTOs, delegan la lógica de negocio en los servicios y utilizan `ResponseEntity` para definir los códigos HTTP.
 
 ### Endpoints
+
+#### Autenticación
+
+| Método | Endpoint | Acceso |
+|---|---|---|
+| POST | `/api/auth/login` | Público; recibe `identifier` (usuario o correo) y `password` |
+| GET | `/api/auth/me` | Requiere Bearer |
+
+El login devuelve `accessToken`, `tokenType` (`Bearer`) y `expiresIn` (900 segundos por defecto).
+Envía el token únicamente en `Authorization: Bearer <token>`.
 
 #### Recintos (Venues)
 
@@ -1303,6 +1333,8 @@ Las excepciones se procesan mediante `GlobalExceptionHandler`. Las respuestas ut
 - `404 Not Found`: recurso solicitado inexistente.
 - `409 Conflict`: duplicados o reglas de negocio incumplidas.
 - `500 Internal Server Error`: error inesperado del servidor.
+- `401 Unauthorized`: falta autenticación, el token es inválido/vencido o la cuenta está inactiva.
+- `403 Forbidden`: el rol no permite la acción o el recurso pertenece a otra persona.
 
 ### Ejecución de las pruebas
 
@@ -1320,7 +1352,7 @@ En Windows CMD o PowerShell:
 .\mvnw.cmd clean test
 ```
 
-La suite incluye pruebas unitarias, pruebas de integración de persistencia y pruebas MVC de los cinco controladores mediante MockMvc.
+La suite incluye pruebas unitarias, pruebas de integración de persistencia, pruebas MVC de controladores y pruebas de JWT/propiedad.
 
 # 34. Autores
 

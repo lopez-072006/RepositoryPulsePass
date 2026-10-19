@@ -8,6 +8,8 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -91,6 +93,21 @@ public class GlobalExceptionHandler {
                 "An unexpected error occurred",
                 Map.of()
         );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        return buildResponse(HttpStatus.FORBIDDEN, "No tiene permisos para realizar esta operación", Map.of());
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthentication(AuthenticationException ex) {
+        return buildResponse(HttpStatus.UNAUTHORIZED, "Credenciales inválidas", Map.of());
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPassword(InvalidPasswordException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), Map.of("password", ex.getMessage()));
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(

@@ -8,6 +8,7 @@ import com.Unimag.PulsePass.exception.BusinessRuleException;
 import com.Unimag.PulsePass.exception.GlobalExceptionHandler;
 import com.Unimag.PulsePass.exception.ResourceNotFoundException;
 import com.Unimag.PulsePass.service.TicketService;
+import com.Unimag.PulsePass.security.SecurityConfig;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -36,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TicketController.class)
-@Import(GlobalExceptionHandler.class)
+@Import({SecurityConfig.class, SecurityMvcTestConfiguration.class, GlobalExceptionHandler.class})
 class TicketControllerTest {
 
     @Autowired
@@ -72,6 +74,7 @@ class TicketControllerTest {
 
     
     @Test
+    @WithMockUser(roles = "USER")
     void purchase_whenRequestIsValid_returnsCreated() throws Exception {
         given(ticketService.purchase(any(PurchaseTicketRequest.class)))
                 .willReturn(ticketResponse());
@@ -87,6 +90,7 @@ class TicketControllerTest {
 
     
     @Test
+    @WithMockUser(roles = "USER")
     void purchase_whenRequestIsInvalid_returnsBadRequest() throws Exception {
         String invalidRequest = """
                 {
@@ -107,6 +111,7 @@ class TicketControllerTest {
 
     
     @Test
+    @WithMockUser(roles = "USER")
     void purchase_whenUserDoesNotExist_returnsNotFound() throws Exception {
         given(ticketService.purchase(any(PurchaseTicketRequest.class)))
                 .willThrow(
@@ -123,6 +128,7 @@ class TicketControllerTest {
 
    
     @Test
+    @WithMockUser(roles = "USER")
     void purchase_whenBusinessRuleIsViolated_returnsConflict()
             throws Exception {
 
@@ -143,6 +149,7 @@ class TicketControllerTest {
 
     
     @Test
+    @WithMockUser(roles = "USER")
     void findByCode_whenTicketExists_returnsOk() throws Exception {
         given(ticketService.findByCode("TKT-001"))
                 .willReturn(ticketResponse());
@@ -154,6 +161,7 @@ class TicketControllerTest {
 
     
     @Test
+    @WithMockUser(roles = "USER")
     void findByUserEmail_returnsTickets() throws Exception {
         given(ticketService.findByUserEmail("user@example.com"))
                 .willReturn(List.of(ticketResponse()));
@@ -169,6 +177,7 @@ class TicketControllerTest {
 
     
     @Test
+    @WithMockUser(roles = "STAFF")
     void findPaidTicketsByEvent_returnsTickets() throws Exception {
         given(ticketService.findPaidTicketsByEvent("EVT-001"))
                 .willReturn(List.of(ticketResponse()));
@@ -185,6 +194,7 @@ class TicketControllerTest {
 
     
     @Test
+    @WithMockUser(roles = "USER")
     void cancel_whenOperationIsValid_returnsOk() throws Exception {
         given(ticketService.cancel("TKT-001"))
                 .willReturn(ticketResponse());
@@ -196,6 +206,7 @@ class TicketControllerTest {
 
     
     @Test
+    @WithMockUser(roles = "USER")
     void cancel_whenBusinessRuleIsViolated_returnsConflict()
             throws Exception {
 
@@ -212,6 +223,7 @@ class TicketControllerTest {
 
     
     @Test
+    @WithMockUser(roles = "STAFF")
     void markAsUsed_whenOperationIsValid_returnsOk() throws Exception {
         given(ticketService.markAsUsed("TKT-001"))
                 .willReturn(ticketResponse());
@@ -221,8 +233,18 @@ class TicketControllerTest {
                 .andExpect(jsonPath("$.ticketCode").value("TKT-001"));
     }
 
+    @Test
+    @WithMockUser(roles = "USER")
+    void userCannotMarkTicketAsUsed() throws Exception {
+        mockMvc.perform(patch("/api/tickets/TKT-001/use"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.status").value(403));
+        verify(ticketService, never()).markAsUsed("TKT-001");
+    }
+
     
     @Test
+    @WithMockUser(roles = "STAFF")
     void markAsUsed_whenBusinessRuleIsViolated_returnsConflict()
             throws Exception {
 

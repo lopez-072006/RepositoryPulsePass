@@ -16,6 +16,9 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.context.annotation.Import;
+import com.Unimag.PulsePass.security.SecurityConfig;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(EventController.class)
+@Import({SecurityConfig.class, SecurityMvcTestConfiguration.class})
 class EventControllerTest {
 
     @Autowired
@@ -44,6 +48,7 @@ class EventControllerTest {
     private EventService eventService;
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void create_validRequest_returns201() throws Exception {
         when(eventService.create(any(CreateEventRequest.class)))
                 .thenReturn(eventResponse(EventStatus.DRAFT));
@@ -63,6 +68,28 @@ class EventControllerTest {
     }
 
     @Test
+    void anonymousCannotCreateEvent() throws Exception {
+        mockMvc.perform(post("/api/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validCreateRequest()))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401));
+        verify(eventService, never()).create(any(CreateEventRequest.class));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void userCannotCreateEvent() throws Exception {
+        mockMvc.perform(post("/api/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validCreateRequest()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.status").value(403));
+        verify(eventService, never()).create(any(CreateEventRequest.class));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void create_invalidRequest_returns400() throws Exception {
         String invalidRequest = """
                 {
@@ -144,6 +171,7 @@ class EventControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void publish_validEvent_returns200() throws Exception {
         when(eventService.publish("CMF-2030"))
                 .thenReturn(eventResponse(EventStatus.PUBLISHED));
@@ -159,6 +187,7 @@ class EventControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void publish_invalidTransition_returns409() throws Exception {
         when(eventService.publish("CMF-2030"))
                 .thenThrow(new BusinessRuleException(
@@ -177,6 +206,7 @@ class EventControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void addArtist_existingArtist_returns200() throws Exception {
         when(eventService.addArtist("CMF-2030", 1L))
                 .thenReturn(eventResponse(EventStatus.DRAFT));

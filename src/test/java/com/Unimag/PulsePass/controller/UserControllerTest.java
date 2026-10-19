@@ -3,6 +3,7 @@ package com.Unimag.PulsePass.controller;
 import com.Unimag.PulsePass.dto.request.RegisterUserRequest;
 import com.Unimag.PulsePass.dto.response.UserResponse;
 import com.Unimag.PulsePass.exception.DuplicateResourceException;
+import com.Unimag.PulsePass.service.AuthService;
 import com.Unimag.PulsePass.service.UserService;
 
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,9 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.context.annotation.Import;
+import com.Unimag.PulsePass.security.SecurityConfig;
 
 import java.time.LocalDate;
 
@@ -27,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
+@Import({SecurityConfig.class, SecurityMvcTestConfiguration.class})
 class UserControllerTest {
 
     @Autowired
@@ -35,9 +40,12 @@ class UserControllerTest {
     @MockitoBean
     private UserService userService;
 
+    @MockitoBean
+    private AuthService authService;
+
     @Test
     void register_validRequest_returns201() throws Exception {
-        when(userService.register(any(RegisterUserRequest.class)))
+        when(authService.register(any(RegisterUserRequest.class)))
                 .thenReturn(userResponse());
 
         mockMvc.perform(post("/api/users")
@@ -50,7 +58,8 @@ class UserControllerTest {
                                   "lastName": "Garcia",
                                   "phone": "3001234567",
                                   "city": "Santa Marta",
-                                  "birthDate": "1990-01-01"
+                                  "birthDate": "1990-01-01",
+                                  "password": "SecurePassword2026!"
                                 }
                                 """))
                 .andExpect(status().isCreated())
@@ -62,7 +71,7 @@ class UserControllerTest {
                         .value("andrea@example.com"))
                 .andExpect(jsonPath("$.active").value(true));
 
-        verify(userService).register(any(RegisterUserRequest.class));
+        verify(authService).register(any(RegisterUserRequest.class));
     }
 
     @Test
@@ -77,7 +86,8 @@ class UserControllerTest {
                                   "lastName": "Garcia",
                                   "phone": "3001234567",
                                   "city": "Santa Marta",
-                                  "birthDate": "1990-01-01"
+                                  "birthDate": "1990-01-01",
+                                  "password": "SecurePassword2026!"
                                 }
                                 """))
                 .andExpect(status().isBadRequest())
@@ -94,7 +104,7 @@ class UserControllerTest {
 
     @Test
     void register_duplicateUsername_returns409() throws Exception {
-        when(userService.register(any(RegisterUserRequest.class)))
+        when(authService.register(any(RegisterUserRequest.class)))
                 .thenThrow(new DuplicateResourceException(
                         "Username already exists: andrea"));
 
@@ -108,7 +118,8 @@ class UserControllerTest {
                                   "lastName": "Garcia",
                                   "phone": "3001234567",
                                   "city": "Santa Marta",
-                                  "birthDate": "1990-01-01"
+                                  "birthDate": "1990-01-01",
+                                  "password": "SecurePassword2026!"
                                 }
                                 """))
                 .andExpect(status().isConflict())
@@ -119,10 +130,11 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.message")
                         .value("Username already exists: andrea"));
 
-        verify(userService).register(any(RegisterUserRequest.class));
+        verify(authService).register(any(RegisterUserRequest.class));
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void findByEmail_existingUser_returns200() throws Exception {
         when(userService.findByEmail("andrea@example.com"))
                 .thenReturn(userResponse());
@@ -140,6 +152,7 @@ class UserControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void findByUsername_existingUser_returns200() throws Exception {
         when(userService.findByUsername("andrea"))
                 .thenReturn(userResponse());
