@@ -1,0 +1,7 @@
+# Entornos privados exportados con valores actuales
+*-private.postman_environment.json
+*.private.postman_environment.json
+# Evidencia que pueda contener datos locales
+registro-ejecucion-local.md
+evidencia-local/
+*.token
