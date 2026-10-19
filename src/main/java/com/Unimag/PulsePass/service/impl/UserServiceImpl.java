@@ -12,6 +12,7 @@ import com.Unimag.PulsePass.repository.UserRepository;
 import com.Unimag.PulsePass.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.time.LocalDate;
 
 @Service
@@ -61,12 +62,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("@authorizationService.canReadUserByEmail(#p0)")
     public UserResponse findByEmail(String email) {
         return userRepository.findByEmailIgnoreCase(email).map(userMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found for email: " + email));
     }
 
     @Override
+    @PreAuthorize("@authorizationService.canReadUserByUsername(#p0)")
     public UserResponse findByUsername(String username) {
         return userRepository.findByUsername(username).map(userMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found for username: " + username));

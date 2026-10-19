@@ -17,6 +17,9 @@ import com.Unimag.PulsePass.repository.VenueRepository;
 import com.Unimag.PulsePass.service.EventService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,6 +41,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public EventResponse create(CreateEventRequest request) {
         if (request == null) throw new BusinessRuleException("Event request is required.");
         if (request.eventCode() == null || request.eventCode().isBlank())
@@ -72,6 +76,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @PreAuthorize("@authorizationService.canReadEvent(#p0)")
     public EventResponse findByCode(String eventCode) {
         return eventRepository.findByEventCode(eventCode).map(eventMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found: " + eventCode));
@@ -85,6 +90,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public EventResponse publish(String eventCode) {
         Event event = getEvent(eventCode);
         if (event.getStatus() != EventStatus.DRAFT)
@@ -99,6 +105,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public EventResponse addArtist(String eventCode, Long artistId) {
         Event event = getEvent(eventCode);
         Artist artist = artistRepository.findById(artistId)
@@ -113,8 +120,17 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventSummaryResponse> findByArtist(String stageName) {
-        return eventRepository.findEventsByArtistStageName(stageName).stream()
+        List<Event> foundEvents = canViewDraftEvents()
+                ? eventRepository.findEventsByArtistStageName(stageName)
+                : eventRepository.findEventsByArtistStageNameAndStatus(stageName, EventStatus.PUBLISHED);
+        return foundEvents.stream()
                 .map(eventMapper::toSummary).toList();
+    }
+
+    private boolean canViewDraftEvents() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null && authentication.getAuthorities().stream().anyMatch(authority ->
+                authority.getAuthority().equals("ROLE_STAFF") || authority.getAuthority().equals("ROLE_ADMIN"));
     }
 
     private Event getEvent(String eventCode) {

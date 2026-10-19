@@ -16,6 +16,7 @@ import com.Unimag.PulsePass.repository.UserRepository;
 import com.Unimag.PulsePass.service.TicketService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.List;
@@ -42,6 +43,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('USER') and @authorizationService.canPurchase(#p0)")
     public TicketResponse purchase(PurchaseTicketRequest request) {
         if (request == null) throw new BusinessRuleException("Purchase request is required.");
         if (request.userEmail() == null || request.userEmail().isBlank())
@@ -85,18 +87,21 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    @PreAuthorize("@authorizationService.canAccessTicket(#p0)")
     public TicketResponse findByCode(String ticketCode) {
         return ticketRepository.findByTicketCode(ticketCode).map(ticketMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + ticketCode));
     }
 
     @Override
+    @PreAuthorize("@authorizationService.canReadTicketsByUserEmail(#p0)")
     public List<TicketResponse> findByUserEmail(String email) {
         return ticketRepository.findByUserEmailIgnoreCaseOrderByPurchaseDateDesc(email).stream()
                 .map(ticketMapper::toResponse).toList();
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
     public List<TicketResponse> findPaidTicketsByEvent(String eventCode) {
         return ticketRepository.findByEventEventCodeAndStatus(eventCode, TicketStatus.PAID).stream()
                 .map(ticketMapper::toResponse).toList();
@@ -104,6 +109,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     @Transactional
+    @PreAuthorize("@authorizationService.canCancelTicket(#p0)")
     public TicketResponse cancel(String ticketCode) {
         Ticket ticket = getTicket(ticketCode);
         if (ticket.getStatus() != TicketStatus.PAID)
@@ -116,6 +122,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasAnyRole('STAFF', 'ADMIN')")
     public TicketResponse markAsUsed(String ticketCode) {
         Ticket ticket = getTicket(ticketCode);
         if (ticket.getStatus() != TicketStatus.PAID)

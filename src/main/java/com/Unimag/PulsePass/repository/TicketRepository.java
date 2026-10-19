@@ -13,6 +13,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     Optional<Ticket> findByTicketCode(String ticketCode);
 
+    boolean existsByTicketCodeAndUser_Id(String ticketCode, Long userId);
+
     List<Ticket> findByUserEmailIgnoreCaseAndStatus(String email, TicketStatus status);
 
     List<Ticket> findByUserEmailIgnoreCaseOrderByPurchaseDateDesc(String email);
