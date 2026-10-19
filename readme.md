@@ -1359,3 +1359,7 @@ La suite incluye pruebas unitarias, pruebas de integración de persistencia, pru
 Proyecto desarrollado por Cristian Garaviz y Sofia Lopez como parte del proceso académico de Ingeniería de Sistemas.
 
 **PulsePass**
+
+## Pruebas E2E manuales
+
+La Fase 5 se ejecuta manualmente desde Postman contra una instancia real conectada a la base PostgreSQL aislada `pulsepass_e2e`. La colección, el ambiente de plantilla, las fixtures, la matriz, el checklist y la bitácora están en [`tests/e2e/README.md`](tests/e2e/README.md). Cada solicitud se envía individualmente; no se usan scripts de Postman, Runner ni Newman.
