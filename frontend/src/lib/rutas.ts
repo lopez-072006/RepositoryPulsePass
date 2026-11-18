@@ -5,4 +5,11 @@ export const RUTAS = {
   SEDES: '/sedes',
   LOGIN: '/login',
   REGISTRO: '/registro',
+  CUENTA: '/cuenta',
+  MIS_TICKETS: '/mis-tickets',
+  DETALLE_TICKET: (ticketCode: string) => `/mis-tickets/${ticketCode}`,
+  STAFF_VALIDACION: '/staff/validacion',
+  ADMIN_EVENTOS: '/admin/eventos',
+  ADMIN_NUEVO_EVENTO: '/admin/eventos/nuevo',
+  DETALLE_EVENTO: (eventCode: string) => `/eventos/${eventCode}`,
 } as const

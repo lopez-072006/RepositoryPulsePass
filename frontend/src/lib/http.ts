@@ -57,10 +57,24 @@ export function postJson<T>(
   url: string,
   body: unknown,
   schema: z.ZodType<T>,
+  options: RequestInit = {},
 ): Promise<T> {
   return requestJson(url, schema, {
+    ...options,
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...options.headers },
     body: JSON.stringify(body),
+  })
+}
+
+export function patchJson<T>(
+  url: string,
+  schema: z.ZodType<T>,
+  options: RequestInit = {},
+): Promise<T> {
+  return requestJson(url, schema, {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options.headers },
   })
 }

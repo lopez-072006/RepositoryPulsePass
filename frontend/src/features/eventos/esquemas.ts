@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { artistaSchema } from '../artistas/esquemas'
 
 export const categoriasEvento = [
   'MUSIC',
@@ -33,3 +34,19 @@ export const eventosPublicadosSchema = z.array(eventoResumenSchema)
 export type EventoResumen = z.infer<typeof eventoResumenSchema>
 export type CategoriaEvento = z.infer<typeof eventoResumenSchema>['category']
 export type EstadoEvento = z.infer<typeof eventoResumenSchema>['status']
+
+export const eventoDetalleSchema = z.object({
+  id: z.number().int(),
+  eventCode: z.string().min(1),
+  name: z.string().min(1),
+  description: z.string().nullable(),
+  category: z.enum(categoriasEvento),
+  status: z.enum(estadosEvento),
+  eventDate: z.string().min(1),
+  minimumAge: z.number().int().nonnegative(),
+  venueCode: z.string().min(1),
+  venueName: z.string().min(1),
+  artists: z.array(artistaSchema),
+})
+
+export type EventoDetalle = z.infer<typeof eventoDetalleSchema>

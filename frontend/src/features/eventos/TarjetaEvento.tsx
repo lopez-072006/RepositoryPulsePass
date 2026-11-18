@@ -1,4 +1,6 @@
+import { Link } from 'react-router'
 import { Tarjeta } from '../../componentes/ui/Tarjeta'
+import { RUTAS } from '../../lib/rutas'
 import type {
   CategoriaEvento,
   EstadoEvento,
@@ -33,28 +35,33 @@ export function TarjetaEvento({ evento }: TarjetaEventoProps) {
   }).format(new Date(evento.eventDate))
 
   return (
-    <Tarjeta>
-      <div className="flex items-start justify-between gap-3">
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-bold ${clasePorCategoria[evento.category]}`}
-        >
-          {evento.category}
-        </span>
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-bold ${clasePorEstado[evento.status]}`}
-        >
-          {evento.status}
-        </span>
-      </div>
+    <Link
+      to={RUTAS.DETALLE_EVENTO(evento.eventCode)}
+      className="block transition hover:-translate-y-1"
+    >
+      <Tarjeta>
+        <div className="flex items-start justify-between gap-3">
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-bold ${clasePorCategoria[evento.category]}`}
+          >
+            {evento.category}
+          </span>
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-bold ${clasePorEstado[evento.status]}`}
+          >
+            {evento.status}
+          </span>
+        </div>
 
-      <p className="mt-5 font-mono text-xs text-slate-500">
-        {evento.eventCode}
-      </p>
-      <h2 className="mt-1 font-titulo text-xl font-bold">{evento.name}</h2>
-      <p className="mt-3 text-sm text-slate-600">{fecha}</p>
-      <p className="mt-1 text-sm text-slate-600">
-        {evento.venueName} · {evento.city}
-      </p>
-    </Tarjeta>
+        <p className="mt-5 font-mono text-xs text-slate-500">
+          {evento.eventCode}
+        </p>
+        <h2 className="mt-1 font-titulo text-xl font-bold">{evento.name}</h2>
+        <p className="mt-3 text-sm text-slate-600">{fecha}</p>
+        <p className="mt-1 text-sm text-slate-600">
+          {evento.venueName} · {evento.city}
+        </p>
+      </Tarjeta>
+    </Link>
   )
 }

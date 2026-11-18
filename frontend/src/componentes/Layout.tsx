@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router'
+import { useAuth } from '../contextos/AuthContext'
 import { RUTAS } from '../lib/rutas'
 
 function enlaceClases(activo: boolean) {
@@ -8,6 +9,7 @@ function enlaceClases(activo: boolean) {
 }
 
 export function Layout() {
+  const { sesion, logout } = useAuth()
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 font-cuerpo text-slate-900">
       <a
@@ -58,6 +60,18 @@ export function Layout() {
             >
               Sedes
             </NavLink>
+            {sesion.estado === 'autenticada' ? (
+              <>
+                <NavLink to={RUTAS.CUENTA} className={({ isActive }) => enlaceClases(isActive)}>Mi cuenta</NavLink>
+                {sesion.usuario.roles.includes('USER') ? <NavLink to={RUTAS.MIS_TICKETS} className={({ isActive }) => enlaceClases(isActive)}>Mis tickets</NavLink> : null}
+                <button className="rounded-lg border border-slate-300 px-3 py-1.5 hover:bg-slate-100" onClick={logout}>Salir</button>
+              </>
+            ) : (
+              <>
+                <NavLink to={RUTAS.LOGIN} className={({ isActive }) => enlaceClases(isActive)}>Ingresar</NavLink>
+                <NavLink to={RUTAS.REGISTRO} className="rounded-lg bg-marca-600 px-3 py-1.5 text-white hover:bg-marca-700">Registrarse</NavLink>
+              </>
+            )}
           </div>
         </nav>
       </header>

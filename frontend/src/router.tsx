@@ -7,6 +7,9 @@ import ListaArtistas from './pages/ListaArtistas'
 import ListaSedes from './pages/ListaSedes'
 import Login from './pages/Login'
 import Registro from './pages/Registro'
+import DetalleEvento from './pages/DetalleEvento'
+import SinPermisos from './pages/SinPermisos'
+import { RutaPorRol, RutaProtegida } from './componentes/RutaProtegida'
 
 const router = createBrowserRouter([
   {
@@ -15,11 +18,23 @@ const router = createBrowserRouter([
     children: [
       { index: true, Component: Inicio },
       { path: 'eventos', Component: CatalogoEventos },
+      { path: 'eventos/:eventCode', Component: DetalleEvento },
       { path: '*', Component: NoEncontrada },
       { path: 'artistas', Component: ListaArtistas },
       { path: 'sedes', Component: ListaSedes },
       { path: 'login', Component: Login },
       { path: 'registro', Component: Registro },
+      { path: '403', Component: SinPermisos },
+      {
+        Component: RutaProtegida,
+        children: [
+          { path: 'cuenta', lazy: async () => ({ Component: (await import('./pages/Cuenta')).default }) },
+          {
+            Component: () => <RutaPorRol roles={['USER']} />,
+            children: [{ path: 'mis-tickets', lazy: async () => ({ Component: (await import('./pages/MisTickets')).default }) }],
+          },
+        ],
+      },
     ],
   },
 ])
