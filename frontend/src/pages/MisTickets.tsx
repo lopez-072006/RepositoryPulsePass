@@ -9,10 +9,12 @@ import { cancelarTicket, obtenerMisTickets } from '../features/tickets/api'
 
 export default function MisTickets() {
   const { sesion } = useAuth(); const cliente = useQueryClient()
-  if (sesion.estado === 'anonima') return null
-  const { token, usuario } = sesion
-  const consulta = useQuery({ queryKey: ['tickets', usuario.email], queryFn: () => obtenerMisTickets(usuario.email, token) })
-  const cancelar = useMutation({ mutationFn: (code: string) => cancelarTicket(code, token), onSuccess: () => void cliente.invalidateQueries({ queryKey: ['tickets', usuario.email] }) })
+  const autenticada = sesion.estado === 'autenticada'
+  const email = autenticada ? sesion.usuario.email : ''
+  const token = autenticada ? sesion.token : ''
+  const consulta = useQuery({ queryKey: ['tickets', email], queryFn: () => obtenerMisTickets(email, token), enabled: autenticada })
+  const cancelar = useMutation({ mutationFn: (code: string) => cancelarTicket(code, token), onSuccess: () => void cliente.invalidateQueries({ queryKey: ['tickets', email] }) })
+  if (!autenticada) return null
   if (consulta.isPending) return <Cargando mensaje="Cargando tus tickets…" />
   if (consulta.isError) return <EstadoError mensaje={consulta.error instanceof Error ? consulta.error.message : 'No fue posible cargar los tickets.'} onReintentar={() => void consulta.refetch()} />
   const tickets = consulta.data ?? []
