@@ -39,6 +39,18 @@ export function Layout() {
               className={({ isActive }) => enlaceClases(isActive)}
             >
               Eventos
+              <NavLink
+    to={RUTAS.ARTISTAS}
+    className={({ isActive }) => enlaceClases(isActive)}
+            >
+            Artistas
+        </NavLink>
+        <NavLink
+            to={RUTAS.SEDES}
+            className={({ isActive }) => enlaceClases(isActive)}
+            >
+            Sedes
+            </NavLink>
             </NavLink>
           </div>
         </nav>

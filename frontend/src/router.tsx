@@ -3,7 +3,8 @@ import { Layout } from './componentes/Layout'
 import CatalogoEventos from './pages/CatalogoEventos'
 import Inicio from './pages/Inicio'
 import NoEncontrada from './pages/NoEncontrada'
-
+import ListaArtistas from './pages/ListaArtistas'
+import ListaSedes from './pages/ListaSedes'
 const router = createBrowserRouter([
   {
     path: '/',
@@ -12,6 +13,8 @@ const router = createBrowserRouter([
       { index: true, Component: Inicio },
       { path: 'eventos', Component: CatalogoEventos },
       { path: '*', Component: NoEncontrada },
+      { path: 'artistas', Component: ListaArtistas },
+      { path: 'sedes', Component: ListaSedes },
     ],
   },
 ])
