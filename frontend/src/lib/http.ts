@@ -14,11 +14,12 @@ const errorResponseSchema = z.object({
   message: z.string().optional(),
 })
 
-export async function getJson<T>(
+async function requestJson<T>(
   url: string,
   schema: z.ZodType<T>,
+  options: RequestInit = {},
 ): Promise<T> {
-  const response = await fetch(url)
+  const response = await fetch(url, options)
   const body: unknown = await response.json().catch(() => null)
 
   if (!response.ok) {
@@ -28,7 +29,7 @@ export async function getJson<T>(
       response.status,
       error.success && error.data.message
         ? error.data.message
-        : 'No fue posible obtener la información.',
+        : 'No fue posible completar la solicitud.',
     )
   }
 
@@ -42,4 +43,24 @@ export async function getJson<T>(
   }
 
   return result.data
+}
+
+export function getJson<T>(
+  url: string,
+  schema: z.ZodType<T>,
+  options?: RequestInit,
+): Promise<T> {
+  return requestJson(url, schema, options)
+}
+
+export function postJson<T>(
+  url: string,
+  body: unknown,
+  schema: z.ZodType<T>,
+): Promise<T> {
+  return requestJson(url, schema, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
 }

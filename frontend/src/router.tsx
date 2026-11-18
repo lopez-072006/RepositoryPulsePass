@@ -5,6 +5,9 @@ import Inicio from './pages/Inicio'
 import NoEncontrada from './pages/NoEncontrada'
 import ListaArtistas from './pages/ListaArtistas'
 import ListaSedes from './pages/ListaSedes'
+import Login from './pages/Login'
+import Registro from './pages/Registro'
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -15,6 +18,8 @@ const router = createBrowserRouter([
       { path: '*', Component: NoEncontrada },
       { path: 'artistas', Component: ListaArtistas },
       { path: 'sedes', Component: ListaSedes },
+      { path: 'login', Component: Login },
+      { path: 'registro', Component: Registro },
     ],
   },
 ])

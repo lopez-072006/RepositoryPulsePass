@@ -17,16 +17,19 @@ export function Layout() {
         Saltar al contenido
       </a>
 
-      <header className="sticky top-0 border-b border-slate-200 bg-white">
+      <header className="sticky top-0 z-10 border-b border-slate-200 bg-white">
         <nav
           aria-label="Principal"
           className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4"
         >
-          <NavLink to={RUTAS.INICIO} className="font-titulo text-xl font-bold text-marca-600">
+          <NavLink
+            to={RUTAS.INICIO}
+            className="font-titulo text-xl font-bold text-marca-600"
+          >
             PulsePass
           </NavLink>
 
-          <div className="flex gap-5 text-sm">
+          <div className="flex items-center gap-6 text-sm font-medium">
             <NavLink
               end
               to={RUTAS.INICIO}
@@ -34,29 +37,35 @@ export function Layout() {
             >
               Inicio
             </NavLink>
+
             <NavLink
               to={RUTAS.EVENTOS}
               className={({ isActive }) => enlaceClases(isActive)}
             >
               Eventos
-              <NavLink
-    to={RUTAS.ARTISTAS}
-    className={({ isActive }) => enlaceClases(isActive)}
-            >
-            Artistas
-        </NavLink>
-        <NavLink
-            to={RUTAS.SEDES}
-            className={({ isActive }) => enlaceClases(isActive)}
-            >
-            Sedes
             </NavLink>
+
+            <NavLink
+              to={RUTAS.ARTISTAS}
+              className={({ isActive }) => enlaceClases(isActive)}
+            >
+              Artistas
+            </NavLink>
+
+            <NavLink
+              to={RUTAS.SEDES}
+              className={({ isActive }) => enlaceClases(isActive)}
+            >
+              Sedes
             </NavLink>
           </div>
         </nav>
       </header>
 
-      <main id="contenido" className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+      <main
+        id="contenido"
+        className="mx-auto w-full max-w-6xl flex-1 px-4 py-8"
+      >
         <Outlet />
       </main>
 

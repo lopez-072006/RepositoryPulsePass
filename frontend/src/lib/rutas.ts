@@ -3,4 +3,6 @@ export const RUTAS = {
   EVENTOS: '/eventos',
   ARTISTAS: '/artistas',
   SEDES: '/sedes',
+  LOGIN: '/login',
+  REGISTRO: '/registro',
 } as const
