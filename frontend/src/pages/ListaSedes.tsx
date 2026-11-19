@@ -3,6 +3,8 @@ import { EstadoError } from '../componentes/ui/EstadoError'
 import { EstadoVacio } from '../componentes/ui/EstadoVacio'
 import { Tarjeta } from '../componentes/ui/Tarjeta'
 import { useSedesActivas } from '../features/sedes/hooks'
+import { Link } from 'react-router'
+import { RUTAS } from '../lib/rutas'
 
 export default function ListaSedes() {
   const { data, error, isError, isPending, refetch } = useSedesActivas()
@@ -43,6 +45,7 @@ export default function ListaSedes() {
             <p className="mt-4 text-sm font-semibold text-marca-600">
               Capacidad: {sede.capacity}
             </p>
+            <Link to={RUTAS.DETALLE_SEDE(sede.code)} className="mt-4 inline-block text-sm font-semibold text-marca-600">Ver sede →</Link>
           </Tarjeta>
         ))}
       </div>

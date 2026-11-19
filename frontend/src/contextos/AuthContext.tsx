@@ -1,6 +1,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -68,6 +69,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     sessionStorage.removeItem(CLAVE_SESION)
     setSesion({ estado: 'anonima' })
   }
+
+  useEffect(() => {
+    const cerrarPorExpiracion = () => logout()
+    window.addEventListener('pulsepass:sesion-expirada', cerrarPorExpiracion)
+    return () => window.removeEventListener('pulsepass:sesion-expirada', cerrarPorExpiracion)
+  }, [])
 
   const value = useMemo(
     () => ({ sesion, login, logout }),

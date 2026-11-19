@@ -64,6 +64,8 @@ export function Layout() {
               <>
                 <NavLink to={RUTAS.CUENTA} className={({ isActive }) => enlaceClases(isActive)}>Mi cuenta</NavLink>
                 {sesion.usuario.roles.includes('USER') ? <NavLink to={RUTAS.MIS_TICKETS} className={({ isActive }) => enlaceClases(isActive)}>Mis tickets</NavLink> : null}
+                {sesion.usuario.roles.some((rol) => rol === 'STAFF' || rol === 'ADMIN') ? <NavLink to={RUTAS.STAFF_VALIDACION} className={({ isActive }) => enlaceClases(isActive)}>Validar ingreso</NavLink> : null}
+                {sesion.usuario.roles.includes('ADMIN') ? <NavLink to={RUTAS.ADMIN_EVENTOS} className={({ isActive }) => enlaceClases(isActive)}>Administrar eventos</NavLink> : null}
                 <button className="rounded-lg border border-slate-300 px-3 py-1.5 hover:bg-slate-100" onClick={logout}>Salir</button>
               </>
             ) : (

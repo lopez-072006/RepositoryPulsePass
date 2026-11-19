@@ -3,6 +3,8 @@ import { EstadoError } from '../componentes/ui/EstadoError'
 import { EstadoVacio } from '../componentes/ui/EstadoVacio'
 import { Tarjeta } from '../componentes/ui/Tarjeta'
 import { useArtistasActivos } from '../features/artistas/hooks'
+import { Link } from 'react-router'
+import { RUTAS } from '../lib/rutas'
 
 export default function ListaArtistas() {
   const { data, error, isError, isPending, refetch } = useArtistasActivos()
@@ -43,6 +45,7 @@ export default function ListaArtistas() {
               {artista.stageName}
             </h2>
             <p className="mt-3 text-slate-600">{artista.country}</p>
+            <Link to={RUTAS.DETALLE_ARTISTA(artista.id)} className="mt-4 inline-block text-sm font-semibold text-marca-600">Ver perfil →</Link>
           </Tarjeta>
         ))}
       </div>

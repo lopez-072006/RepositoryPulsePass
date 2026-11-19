@@ -23,6 +23,9 @@ async function requestJson<T>(
   const body: unknown = await response.json().catch(() => null)
 
   if (!response.ok) {
+    if (response.status === 401) {
+      window.dispatchEvent(new Event('pulsepass:sesion-expirada'))
+    }
     const error = errorResponseSchema.safeParse(body)
 
     throw new ApiError(
